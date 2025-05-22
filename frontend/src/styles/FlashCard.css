@@ -1,0 +1,22 @@
+.panel {
+    width: 320px;
+    padding: 20px;
+    margin: 10px;
+    background-color: #f9f9fb;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    text-align: left;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .panel:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  }
+  
+  .word-title {
+    margin-bottom: 12px;
+    color: #2c3e50;
+    font-size: 20px;
+    font-weight: 600;
+  }
