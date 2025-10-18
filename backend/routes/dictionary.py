@@ -24,6 +24,16 @@ def get_db():
 
 @router.get("/enter")
 def enter_word(word: str, db: Session = Depends(get_db)):
+    # Check if word already exists in DB
+    db_word = db.query(Word).filter(Word.word.ilike(word)).first()
+    if db_word:
+        return {
+            "word": db_word.word,
+            "meaning": db_word.meaning,
+            "example": db_word.example,
+            "source": "database"
+        }
+
     # Fetch word meaning from a dictionary API
     url = f"https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{word}?key={DICTIONARY_API_KEY}"
     res = requests.get(url)
@@ -71,5 +81,5 @@ def enter_word(word: str, db: Session = Depends(get_db)):
         traceback.print_exc()
         return {"error": "Failed to save word to database"}
 
-    return {"word": word, "meaning": meaning, "example": example, "message": "Word saved successfully"}
+    return {"word": word, "meaning": meaning, "example": example, "source": "api"}
     
