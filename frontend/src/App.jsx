@@ -1,45 +1,70 @@
-
-import './styles/App.css'
-import React from 'react';
-import { useState } from 'react';
-import FlashCard from './components/FlashCard';
+import React, { useState, useEffect } from "react";
+import { addWord, getWords } from "./api/dictionary";
+import "./styles/App.css"; // import the CSS file
 
 function App() {
-  // returns a list of flashcards
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [flashcards, setFlashcards] = useState([]);
 
-  const handleAddWord = () => {
-    // Mock data for now
-    if (input.trim()) {
-      const mockData = {
-        word: input,
-        meaning: 'This is a mock meaning',
-        example: 'This is a mock example sentence',
-        synonyms: ['x','y','z']
+  useEffect(() => {
+    const fetchWords = async () => {
+      try {
+        const savedWords = await getWords();
+        setFlashcards(savedWords);
+      } catch (error) {
+        console.error("Failed to fetch words:", error);
       }
-      setFlashcards([...flashcards, mockData])
-      setInput('');
+    };
+    fetchWords();
+  }, []);
+
+  const handleAddWord = async () => {
+    if (!input) return;
+
+    try {
+      const newWord = await addWord(input);
+      if (!newWord.error) {
+        setFlashcards([newWord, ...flashcards]);
+        setInput("");
+      } else {
+        alert(newWord.error);
+      }
+    } catch (error) {
+      console.error("Error adding word:", error);
+      alert("Failed to add word");
     }
-  }
+  };
+
   return (
-    <div className='app'>
-      <div className='input-section'>
-        <input 
-        type="text"
-        placeholder='Enter your word..'
-        value={input}
-        // This line is used to set the state of the input in sync with the user's input
-        onChange={(e) => setInput(e.target.value)}/>
+    <div className="app-container">
+      <h1>Dictionary Flashcards</h1>
+
+      {/* Input Section */}
+      <div className="input-section">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Enter a word"
+          className="word-input"
+        />
+        <button onClick={handleAddWord} className="add-button">
+          Add Word
+        </button>
       </div>
-      <button onClick={handleAddWord}>Add Word</button>
-      <div className='card-container'>
+
+      {/* Flashcards Section */}
+      <div className="flashcards-container">
         {flashcards.map((card, index) => (
-          <FlashCard key={index} wordData={card} />
+          <div key={index} className="flashcard">
+            <h3>{card.word}</h3>
+            <p><strong>Meaning:</strong> {card.meaning}</p>
+            {card.example && <p><strong>Example:</strong> {card.example}</p>}
+          </div>
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

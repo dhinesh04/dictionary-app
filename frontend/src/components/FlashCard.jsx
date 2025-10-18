@@ -1,15 +1,20 @@
-import React from "react";
+import React, {useState} from "react";
 import '../styles/FlashCard.css';
 
 const FlashCard = ({ wordData }) => {
+    const [flipped, setFlipped] = useState(false);
+
     if (!wordData) return null;
 
     return (
-        <div className="panel">
-            <h2 className="word-title">{wordData.word}</h2>
-            <p><strong>Meaning:</strong> {wordData.meaning}</p>
-            <p><strong>Example:</strong> {wordData.example}</p>
-            <p><strong>Synonyms:</strong> {wordData.synonyms.join(', ') || 'None'}</p>
+        <div className={`flashcard ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
+            <div className="front">
+                <h3>{wordData.word}</h3>
+            </div>
+            <div className="back">
+                <p><strong>Meaning:</strong> {wordData.meaning}</p>
+                {wordData.example && <p><strong>Example:</strong> {wordData.example}</p>}
+            </div>
         </div>
     )
 }
