@@ -1,8 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 import requests
 from dotenv import load_dotenv
 import os
 import re
+from sqlalchemy.orm import Session
+from database import SessionLocal
+from models import Word
 
 
 load_dotenv()
@@ -11,8 +14,16 @@ DICTIONARY_API_KEY = os.getenv("DICTIONARY_API_KEY")
 
 router = APIRouter(prefix="/api", tags=["Dictionary"])
 
+# Dependency to get DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 @router.get("/enter")
-def enter_word(word: str):
+def enter_word(word: str, db: Session = Depends(get_db)):
     # Fetch word meaning from a dictionary API
     url = f"https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{word}?key={DICTIONARY_API_KEY}"
     res = requests.get(url)
@@ -48,5 +59,17 @@ def enter_word(word: str):
     if example:
         example = re.sub(r"\{[^}]+\}", "", example)
 
-    return {"word": word, "meaning": meaning, "example": example}
+    # Save the word to DB
+    try:
+        db_word = Word(word=word, meaning=meaning, example=example)
+        db.add(db_word)
+        db.commit()
+        db.refresh(db_word)
+    except Exception as e:
+        import traceback
+        print("DB Error:", e)
+        traceback.print_exc()
+        return {"error": "Failed to save word to database"}
+
+    return {"word": word, "meaning": meaning, "example": example, "message": "Word saved successfully"}
     
