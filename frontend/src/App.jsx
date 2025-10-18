@@ -5,6 +5,7 @@ import "./styles/App.css"; // import the CSS file
 function App() {
   const [input, setInput] = useState("");
   const [flashcards, setFlashcards] = useState([]);
+  const [flipped, setFlipped] = useState({});
 
   useEffect(() => {
     const fetchWords = async () => {
@@ -35,6 +36,10 @@ function App() {
     }
   };
 
+  const toggleFlip = (index) => {
+    setFlipped((prev) => ({...prev, [index]: !prev[index]}));
+  }
+
   return (
     <div className="app-container">
       <h1>Dictionary Flashcards</h1>
@@ -56,11 +61,22 @@ function App() {
       {/* Flashcards Section */}
       <div className="flashcards-container">
         {flashcards.map((card, index) => (
-          <div key={index} className="flashcard">
-            <h3>{card.word}</h3>
-            <p><strong>Meaning:</strong> {card.meaning}</p>
-            {card.example && <p><strong>Example:</strong> {card.example}</p>}
-          </div>
+          <div 
+          key={index} 
+          className={`flashcard ${flipped[index] ? "flipped": ""}`}
+          onClick={() => toggleFlip(index)}
+          >
+            <div className="flashcard-inner">
+              <div className="flashcard-front">
+                <h3>{card.word}</h3>
+                <p> Click to reveal meaning</p>
+              </div>
+              <div className="flashcard-back">
+                <p><strong>Meaning:</strong> {card.meaning}</p>
+                {card.example && (<p><strong>Example:</strong> {card.example}</p>)}
+              </div>
+            </div>
+        </div>
         ))}
       </div>
     </div>
