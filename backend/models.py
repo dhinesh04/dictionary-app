@@ -8,4 +8,4 @@ class Word(Base):
     word = Column(String, unique=True, index=True)
     meaning = Column(String)
     example = Column(String, nullable=True)
-    date_added = Column(DateTime(timezone=True), server_default=func.now())
+    date_added = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
