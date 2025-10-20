@@ -5,7 +5,7 @@ from models import User
 from schemas import UserCreate, UserLogin, UserResponse
 from database import SessionLocal
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
 

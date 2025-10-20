@@ -7,12 +7,11 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Word
 
-
 load_dotenv()
 
 DICTIONARY_API_KEY = os.getenv("DICTIONARY_API_KEY")
 
-router = APIRouter(prefix="/api", tags=["Dictionary"])
+router = APIRouter(prefix="/api", tags=["dictionary"])
 
 # Dependency to get DB session
 def get_db():
@@ -23,9 +22,9 @@ def get_db():
         db.close()
 
 @router.get("/enter")
-def enter_word(word: str, db: Session = Depends(get_db)):
+def enter_word(word: str, user_id: int, db: Session = Depends(get_db)):
     # Check if word already exists in DB
-    db_word = db.query(Word).filter(Word.word.ilike(word)).first()
+    db_word = db.query(Word).filter(Word.word.ilike(word), Word.user_id == user_id).first()
     if db_word:
         return {
             "word": db_word.word,
@@ -71,7 +70,7 @@ def enter_word(word: str, db: Session = Depends(get_db)):
 
     # Save the word to DB
     try:
-        db_word = Word(word=word, meaning=meaning, example=example)
+        db_word = Word(word=word, meaning=meaning, example=example, user_id=user_id)
         db.add(db_word)
         db.commit()
         db.refresh(db_word)
@@ -82,4 +81,17 @@ def enter_word(word: str, db: Session = Depends(get_db)):
         return {"error": "Failed to save word to database"}
 
     return {"word": word, "meaning": meaning, "example": example, "source": "api"}
+
+@router.get("/get_words/{user_id}")
+def get_words(user_id: int, db: Session = Depends(get_db)):
+    user_words = db.query(Word).filter(Word.user_id == user_id).all()
+    return [
+        {
+            "id": w.id,
+            "word": w.word,
+            "meaning": w.meaning,
+            "example": w.example
+        }
+        for w in user_words
+    ]
     

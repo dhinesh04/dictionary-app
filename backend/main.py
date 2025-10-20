@@ -1,9 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth
+from routers import auth_routers, dictionary_routers
 from database import engine, Base
-
-from routes import dictionary, words
 
 app = FastAPI(title = "Dictionary App")
 
@@ -21,9 +19,8 @@ app.add_middleware(
     allow_headers=["*"],    # allow all headers
 )
 
-app.include_router(dictionary.router)
-app.include_router(words.router)
-app.include_router(auth.router, prefix="/api", tags=["auth"])
+app.include_router(dictionary_routers.router, tags=["dictionary"])
+app.include_router(auth_routers.router, tags=["auth"])
 
 @app.get("/")
 def home():
