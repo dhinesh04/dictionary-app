@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from "react";
 import { addWord, getWords } from "../api/api";
 import "../styles/Dashboard.css";
+import FlashCard from "../components/FlashCard";
 
 const Dashboard = () => {
-    const [input, setInput] = useState([]);
+    const [input, setInput] = useState("");
     const [flashcards, setFlashcards] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [flipped, setFlipped] = useState({});
     
     const userId = localStorage.getItem("user_id");
 
@@ -33,7 +33,7 @@ const Dashboard = () => {
         if (!input) return;
 
         try {
-        const newWord = await addWord(input, userId);
+        const newWord = await addWord(input.toLowerCase(), userId);
         if (!newWord.error) {
             setFlashcards([newWord, ...flashcards]);
             setInput("");
@@ -51,10 +51,6 @@ const Dashboard = () => {
         localStorage.removeItem("user_id");
         window.location.href = "/login";
     };
-
-    const toggleFlip = (index) => {
-        setFlipped((prev) => ({...prev, [index]: !prev[index]}));
-    }
 
     if (loading) return <p>Loading your words...</p>;
 
@@ -81,23 +77,8 @@ const Dashboard = () => {
 
             {/* Flashcards Section */}
             <div className="flashcards-container">
-                {flashcards.map((card, index) => (
-                <div 
-                key={index} 
-                className={`flashcard ${flipped[index] ? "flipped": ""}`}
-                onClick={() => toggleFlip(index)}
-                >
-                    <div className="flashcard-inner">
-                    <div className="flashcard-front">
-                        <h3>{card.word}</h3>
-                        <p> Click to reveal meaning</p>
-                    </div>
-                    <div className="flashcard-back">
-                        <p><strong>Meaning:</strong> {card.meaning}</p>
-                        {card.example && (<p><strong>Example:</strong> {card.example}</p>)}
-                    </div>
-                    </div>
-                </div>
+                {flashcards.map((wordData, index) => (
+                    <FlashCard key={index} wordData={wordData}/>
                 ))}
             </div>
         </div>

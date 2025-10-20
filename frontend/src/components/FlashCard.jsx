@@ -8,12 +8,14 @@ const FlashCard = ({ wordData }) => {
 
     return (
         <div className={`flashcard ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
-            <div className="front">
-                <h3>{wordData.word}</h3>
-            </div>
-            <div className="back">
-                <p><strong>Meaning:</strong> {wordData.meaning}</p>
-                {wordData.example && <p><strong>Example:</strong> {wordData.example}</p>}
+            <div className="flashcard-inner">
+                <div className="front">
+                    <h3>{wordData.word}</h3>
+                </div>
+                <div className="back">
+                    <p><strong>Meaning:</strong> {wordData.meaning}</p>
+                    {wordData.example && <p><strong>Example:</strong> {wordData.example}</p>}
+                </div>
             </div>
         </div>
     )
