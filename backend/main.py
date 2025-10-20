@@ -1,9 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from routers import auth
+from database import engine, Base
 
 from routes import dictionary, words
 
 app = FastAPI(title = "Dictionary App")
+
+Base.metadata.create_all(bind=engine)
 
 # Allow your frontend to talk to backend
 origins = [
@@ -19,3 +23,8 @@ app.add_middleware(
 
 app.include_router(dictionary.router)
 app.include_router(words.router)
+app.include_router(auth.router, prefix="/api", tags=["auth"])
+
+@app.get("/")
+def home():
+    return {"message": "Welcome to the Dictionary App!"}
