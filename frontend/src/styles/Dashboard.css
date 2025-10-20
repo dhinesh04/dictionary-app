@@ -33,3 +33,22 @@
 .no-words {
   color: #888;
 }
+
+.month-flashcards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Style the month headers */
+.flashcards-container h3 {
+  width: 100%;
+  text-align: left;
+  font-size: 1.25rem;
+  margin: 1rem 0 0.5rem 0;
+  color: #2c3e50;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.25rem;
+}

@@ -24,7 +24,7 @@ def get_db():
 @router.get("/enter")
 def enter_word(word: str, user_id: int, db: Session = Depends(get_db)):
     # Check if word already exists in DB
-    db_word = db.query(Word).filter(Word.word.ilike(word), Word.user_id == user_id).first()
+    db_word = db.query(Word).filter(Word.user_id == user_id).order_by(Word.date_added.desc()).all()
     if db_word:
         return {
             "word": db_word.word,
@@ -90,7 +90,8 @@ def get_words(user_id: int, db: Session = Depends(get_db)):
             "id": w.id,
             "word": w.word,
             "meaning": w.meaning,
-            "example": w.example
+            "example": w.example,
+            "date_added": w.date_added.isoformat()
         }
         for w in user_words
     ]

@@ -54,6 +54,13 @@ const Dashboard = () => {
 
     if (loading) return <p>Loading your words...</p>;
 
+    const groupedByMonth = flashcards.reduce((acc, card) => {
+        const monthYear = new Date(card.date_added).toLocaleString("default", { month: "long", year: "numeric" });
+        if (!acc[monthYear]) acc[monthYear] = [];
+        acc[monthYear].push(card);
+        return acc;
+    }, {});
+
     return (
         <div className="dashboard-container">
             <div className="dashboard-header">
@@ -77,12 +84,18 @@ const Dashboard = () => {
 
             {/* Flashcards Section */}
             <div className="flashcards-container">
-                {flashcards.map((wordData, index) => (
-                    <FlashCard key={index} wordData={wordData}/>
-                ))}
+                {Object.keys(groupedByMonth).map((month) => (
+                    <div key={month}>
+                        <h3>{month}</h3>
+                        <div className="month-flashcards">
+                            {groupedByMonth[month].map((card, index) => (
+                                <FlashCard key={index} wordData={card}/>
+                        ))}
+                        </div>
+                    </div>
+            ))}
             </div>
-        </div>
-    )
-}
+    </div>
+)}
 
 export default Dashboard;
