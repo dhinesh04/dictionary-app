@@ -5,6 +5,7 @@ const BASE_URL = "http://localhost:8000/api";
 // Helper to get stored token
 const getAuthHeaders = () => {
   const token = localStorage.getItem("access_token");
+  //console.log("token", token)
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -38,8 +39,8 @@ export const getWords = async (userId) => {
 export const loginUser = async (email, password) => {
   try {
     const response = await axios.post(`${BASE_URL}/auth/login`, { email, password });
-    console.log("response DATA", response.data)
-    localStorage.setItem("token", response.data.access_token);
+    // console.log("response DATA", response.data)
+    localStorage.setItem("access_token", response.data.access_token);
     localStorage.setItem("user_id", response.data.user_id);
     return response.data;
   } catch (err) {

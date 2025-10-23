@@ -41,7 +41,7 @@ def get_current_user(authorization: str = Header(None)):
 @router.get("/enter")
 def enter_word(word: str, user_id: int = Depends(get_current_user), db: Session = Depends(get_db)):
     # Check if word already exists in DB
-    db_word = db.query(Word).filter(Word.user_id == user_id).order_by(Word.date_added.desc()).all()
+    db_word = db.query(Word).filter(Word.user_id == user_id, Word.word == word).first()
     if db_word:
         return {
             "word": db_word.word,
@@ -97,7 +97,7 @@ def enter_word(word: str, user_id: int = Depends(get_current_user), db: Session 
         traceback.print_exc()
         return {"error": "Failed to save word to database"}
 
-    return {"word": word, "meaning": meaning, "example": example, "source": "api"}
+    return {"word": word, "meaning": meaning, "example": example, "source": "api", "date_added": db_word.date_added.isoformat()}
 
 @router.get("/get_words/{user_id}")
 def get_words(user_id: int = Depends(get_current_user), db: Session = Depends(get_db)):
