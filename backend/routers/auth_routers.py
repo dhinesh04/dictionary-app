@@ -4,6 +4,7 @@ from passlib.context import CryptContext
 from models import User
 from schemas import UserCreate, UserLogin, UserResponse
 from database import SessionLocal
+from utils.auth_utils import create_access_token, verify_access_token
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -42,5 +43,12 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
     if not verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid email or password")
     
-    return {"message":"Login successful", "user_id": db_user.id}
+    access_token = create_access_token(data={"sub": str(db_user.id)})
+    
+    return {"message":"Login successful", 
+            "user_id": db_user.id,
+            "token_type": "bearer",
+            "user_id": db_user.id,
+            "access_token": access_token
+            }
     

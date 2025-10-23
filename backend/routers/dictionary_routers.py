@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status, Header, HTTPException
 import requests
 from dotenv import load_dotenv
 import os
@@ -6,6 +6,7 @@ import re
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Word
+from utils.auth_utils import verify_access_token
 
 load_dotenv()
 
@@ -21,8 +22,24 @@ def get_db():
     finally:
         db.close()
 
+def get_current_user(authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header missing"
+        )
+    token = authorization.replace("Bearer ", "")
+    user_id = verify_access_token(token)
+
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token"
+        )
+    return int(user_id)
+
 @router.get("/enter")
-def enter_word(word: str, user_id: int, db: Session = Depends(get_db)):
+def enter_word(word: str, user_id: int = Depends(get_current_user), db: Session = Depends(get_db)):
     # Check if word already exists in DB
     db_word = db.query(Word).filter(Word.user_id == user_id).order_by(Word.date_added.desc()).all()
     if db_word:
@@ -83,7 +100,7 @@ def enter_word(word: str, user_id: int, db: Session = Depends(get_db)):
     return {"word": word, "meaning": meaning, "example": example, "source": "api"}
 
 @router.get("/get_words/{user_id}")
-def get_words(user_id: int, db: Session = Depends(get_db)):
+def get_words(user_id: int = Depends(get_current_user), db: Session = Depends(get_db)):
     user_words = db.query(Word).filter(Word.user_id == user_id).all()
     return [
         {

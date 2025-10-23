@@ -14,10 +14,12 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         const res = await loginUser(email, password);
+        console.log(res)
         if (res.error) {
         setError(res.error);
         setMessage("");
         } else {
+        localStorage.setItem("token", res.access_token);
         localStorage.setItem("user_id", res.user_id);
         setMessage("User logged in successfully");
         setError("");
