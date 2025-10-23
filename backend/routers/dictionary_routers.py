@@ -41,12 +41,12 @@ def get_current_user(authorization: str = Header(None)):
 @router.get("/enter")
 def enter_word(word: str, user_id: int = Depends(get_current_user), db: Session = Depends(get_db)):
     # Check if word already exists in DB
-    db_word = db.query(Word).filter(Word.user_id == user_id, Word.word == word).first()
-    if db_word:
+    existing_word = db.query(Word).filter(Word.user_id == user_id, Word.word == word).first()
+    if existing_word:
         return {
-            "word": db_word.word,
-            "meaning": db_word.meaning,
-            "example": db_word.example,
+            "word": existing_word.word,
+            "meaning": existing_word.meaning,
+            "example": existing_word.example,
             "source": "database"
         }
 
@@ -87,17 +87,17 @@ def enter_word(word: str, user_id: int = Depends(get_current_user), db: Session 
 
     # Save the word to DB
     try:
-        db_word = Word(word=word, meaning=meaning, example=example, user_id=user_id)
-        db.add(db_word)
+        new_word = Word(word=word, meaning=meaning, example=example, user_id=user_id)
+        db.add(new_word)
         db.commit()
-        db.refresh(db_word)
+        db.refresh(new_word)
     except Exception as e:
         import traceback
         print("DB Error:", e)
         traceback.print_exc()
         return {"error": "Failed to save word to database"}
 
-    return {"word": word, "meaning": meaning, "example": example, "source": "api", "date_added": db_word.date_added.isoformat()}
+    return {"word": new_word.word, "meaning": new_word.meaning, "example": new_word.example, "source": "api", "date_added": new_word.date_added.isoformat()}
 
 @router.get("/get_words/{user_id}")
 def get_words(user_id: int = Depends(get_current_user), db: Session = Depends(get_db)):

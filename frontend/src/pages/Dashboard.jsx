@@ -31,7 +31,13 @@ const Dashboard = () => {
 
     const handleAddWord = async () => {
         if (!input) return;
-
+        const lowerInput = input.toLowerCase();
+        const alreadyExists = flashcards.some(card => card.word.toLowerCase() === lowerInput);
+        if (alreadyExists) {
+            alert(`"${lowerInput}" is already saved!`);
+            setInput("");
+            return;
+        }
         try {
         const newWord = await addWord(input.toLowerCase(), userId);
         if (!newWord.error) {
