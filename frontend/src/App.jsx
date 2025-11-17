@@ -2,6 +2,7 @@ import {BrowserRouter as Router, Routes, Route, Navigate, Link} from "react-rout
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./pages/Dashboard";
+import GoogleLoginButton from "./components/GoogleLoginButton";
 import "./styles/App.css"; // import the CSS file
 
 
@@ -22,6 +23,10 @@ function Home() {
         <Link to="/register">
           <button className="home-btn">Register</button>
         </Link>
+      </div>
+      {/* Google login on the homepage */}
+      <div className="home-buttons" style={{ marginTop: "1.5rem" }}>
+        <GoogleLoginButton />
       </div>
     </div>
   );

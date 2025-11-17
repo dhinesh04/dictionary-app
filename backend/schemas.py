@@ -16,3 +16,11 @@ class UserResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class GoogleLoginRequest(BaseModel):
+    id_token: str
+
+class AuthResponse(BaseModel):
+    user_id: int
+    access_token: str
+    token_type: str = "bearer"

@@ -59,3 +59,21 @@ export const registerUser = async (username, email, password) => {
     return { error: err.response?.data?.detail || "Registration failed" };
   }
 };
+
+// Google login api
+export const googleLogin = async (idToken) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/auth/google-login`, {
+      id_token: idToken,
+    });
+
+    // Store JWT + user_id (same as normal login)
+    localStorage.setItem("access_token", response.data.access_token);
+    localStorage.setItem("user_id", response.data.user_id);
+
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    return { error: err.response?.data?.detail || "Google login failed" };
+  }
+};
